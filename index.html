@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f4f6f0">
+	<meta name="description" content="Secure team access with role-based permissions.">
+	<title>Den Promise | Secure access</title>
+	<link rel="stylesheet" href="style.css?v=5">
+	<script src="app.js?v=7" defer></script>
+</head>
+<body>
+	<main class="auth-shell" id="loginView">
+		<aside class="brand-panel" aria-label="About Den Promise access">
+			<a class="brand" href="/" aria-label="Den Promise home"><span class="brand-mark">DP</span><span>Den Promise<span class="brand-dot">.</span></span></a>
+			<div class="brand-story">
+				<p class="eyebrow">Identity &amp; access</p>
+				<h1>Access, with intention.</h1>
+				<p>One secure sign-in for your team. Your role determines what you can see and do.</p>
+				<div class="shield-art" aria-hidden="true">
+					<svg viewBox="0 0 360 190" focusable="false">
+						<path class="orbit" d="M24 112c36-62 90-81 144-52 55 30 102 21 168-23M24 148c52-33 99-39 142-15 52 29 100 21 164-14" />
+						<path class="shield" d="m180 27 52 19v46c0 34-20 58-52 74-32-16-52-40-52-74V46l52-19Z" />
+						<path class="lock" d="M165 87v-9a15 15 0 0 1 30 0v9m-34 0h38v30h-38z" />
+						<circle cx="51" cy="72" r="5"/><circle cx="308" cy="55" r="5"/><circle cx="80" cy="150" r="4"/><circle cx="282" cy="132" r="4"/>
+					</svg>
+				</div>
+			<ul class="security-list">
+				<li><span aria-hidden="true">✓</span>Password verification</li>
+				<li><span aria-hidden="true">✓</span>Protected password hashes</li>
+				<li><span aria-hidden="true">✓</span>Admin-reviewed sign-up</li>
+				<li><span aria-hidden="true">✓</span>Role-based permissions</li>
+			</ul>
+			</div>
+			<footer class="brand-footer"><span>Northstar Access</span><span>Identity layer · 01</span></footer>
+		</aside>
+
+		<section class="auth-side">
+			<div class="auth-card" aria-live="polite">
+				<a class="mobile-brand brand" href="/" aria-label="Den Promise home"><span class="brand-mark">DP</span><span>Den Promise<span class="brand-dot">.</span></span></a>
+				<section id="setupStep" hidden>
+					<p class="step-label"><span></span>Initial setup · Admin</p>
+					<h2>Create your admin account</h2>
+					<p class="intro">Set up the account that manages staff access. Use a unique password with at least 12 characters.</p>
+					<form id="setupForm">
+						<div class="field"><label for="setupName">Full name</label><input id="setupName" name="name" autocomplete="name" maxlength="80" required></div>
+						<div class="field"><label for="setupEmail">Email <span class="optional">optional</span></label><input id="setupEmail" name="email" type="email" autocomplete="email" maxlength="254"></div>
+						<div class="field"><label for="setupUsername">Username</label><input id="setupUsername" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+						<div class="field"><label for="setupPassword">Password</label><input id="setupPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+						<button class="primary" type="submit">Create admin account <span aria-hidden="true">→</span></button>
+						<p class="message" id="setupMessage" role="alert"></p>
+					</form>
+				</section>
+ 
+				<section id="passwordStep" hidden>
+					<p class="step-label"><span></span>Account sign in</p>
+					<h2>Welcome back</h2>
+					<p class="intro">Sign in with your account credentials to continue.</p>
+					<form id="loginForm">
+						<div class="field"><label for="username">Email or username</label><input id="username" name="username" autocomplete="username" placeholder="name@example.com or alex.admin" required><p class="hint">Use the email address on your account or your username.</p></div>
+						<div class="field"><label for="password">Password</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="reveal" id="togglePassword" type="button" aria-label="Show password">Show</button></div></div>
+						<div class="remember"><label><input id="savePassword" type="checkbox"><span>Save password in this browser</span></label><p class="hint">Uses your browser password manager. This app never stores your plain-text password.</p></div>
+						<button class="primary" type="submit">Continue securely <span aria-hidden="true">→</span></button>
+						<p class="message" id="loginMessage" role="alert"></p>
+					</form>
+					<div class="google-signin" id="googleSignInSection" hidden>
+						<p class="google-divider">Or continue with</p>
+						<div id="googleSignInButton"></div>
+						<p class="hint">New Google accounts receive a confirmation email and need administrator approval.</p>
+						<p class="message" id="googleLoginMessage" role="status"></p>
+					</div>
+					<p class="hint recovery">Forgot your password? Contact your administrator to recover your account.</p>
+					<button class="back-button" id="showSignupButton" type="button">Create a viewer account</button>
+					<p class="server-note">Passwords and permissions are checked by the Node.js server. New viewer accounts need administrator approval.</p>
+				</section>
+
+				<section id="signupStep" hidden>
+					<p class="step-label"><span></span>New account</p>
+					<h2>Create your account</h2>
+					<p class="intro">Request a viewer account with your email and a strong password. An administrator must approve your request before you can sign in.</p>
+					<form id="signupForm">
+						<div class="field"><label for="signupName">Full name</label><input id="signupName" name="name" autocomplete="name" maxlength="80" required></div>
+						<div class="field"><label for="signupEmail">Email</label><input id="signupEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+						<div class="field"><label for="signupUsername">Username</label><input id="signupUsername" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+						<div class="field"><label for="signupPassword">Password</label><input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+						<button class="primary" type="submit">Submit access request <span aria-hidden="true">→</span></button>
+						<p class="message" id="signupMessage" role="alert"></p>
+					</form>
+					<div class="google-signin" id="googleSignupSection" hidden>
+						<p class="google-divider">Or request access with Google</p>
+						<div id="googleSignupButton"></div>
+						<p class="hint">Your verified Google email will receive a confirmation. An administrator must approve your account.</p>
+						<p class="message" id="googleSignupMessage" role="status"></p>
+					</div>
+					<button class="back-button" id="cancelSignupButton" type="button">← Back to sign in</button>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<main class="workspace" id="appView" hidden>
+		<header class="workspace-header">
+			<div class="workspace-brand"><span class="brand-mark">N</span><div><h1>Northstar Access</h1><p id="welcomeText">Team directory</p></div></div>
+			<div class="session-actions"><span class="role-badge" id="roleBadge"></span><button class="text-button" id="logoutButton" type="button">Sign out</button></div>
+		</header>
+		<div class="content">
+			<section id="adminDashboard" hidden>
+			<header class="content-heading"><div><p class="eyebrow">Workspace</p><h2>Team dashboard</h2><p>Review your access, manage requests, and see your approved team.</p></div><span class="dashboard-date" id="dashboardDate"></span></header>
+
+			<section class="dashboard-stats" aria-label="Workspace summary">
+				<article class="stat-card"><span class="stat-label">Approved members</span><strong id="memberCount">—</strong><span class="stat-caption">Team directory</span></article>
+				<article class="stat-card admin-stat" id="pendingStatCard" hidden><span class="stat-label">Awaiting review</span><strong id="pendingCount">0</strong><span class="stat-caption">Access requests</span></article>
+				<article class="stat-card" id="accessStatCard"><span class="stat-label">Your access</span><strong id="accessMetric">Member</strong><span class="stat-caption">Assigned role</span></article>
+				<article class="stat-card"><span class="stat-label">Digital signing</span><strong class="stat-small" id="signingMetric">Preparing</strong><span class="stat-caption">This browser's signing key</span></article>
+			</section>
+
+			<section class="panel approvals-panel" id="approvalsPanel" aria-labelledby="approvalsHeading" hidden>
+				<div class="approvals-heading"><div><span class="eyebrow">Access control</span><h3 id="approvalsHeading">New access requests</h3><p>Approve accounts before applicants can sign in.</p></div><span class="request-count" id="requestCount">0 pending</span></div>
+				<div class="approval-list" id="approvalRows"></div>
+				<p class="message" id="approvalMessage" role="status"></p>
+			</section>
+
+			<div class="directory-wrap"><table class="directory"><thead><tr><th>Team member</th><th>Username</th><th>Role</th><th>Access</th></tr></thead><tbody id="staffRows"></tbody></table></div>
+			<p class="directory-message" id="directoryMessage" role="status"></p>
+
+			<section class="admin-tools" id="adminTools">
+				<h3>Add a team account</h3><p>Give each new user their initial password securely.</p>
+				<form class="staff-form" id="staffForm">
+					<div class="field"><label for="staffName">Full name</label><input id="staffName" name="name" autocomplete="name" maxlength="80" required></div>
+					<div class="field"><label for="staffEmail">Email <span class="optional">optional</span></label><input id="staffEmail" name="email" type="email" autocomplete="email" maxlength="254"></div>
+					<div class="field"><label for="staffUsername">Username</label><input id="staffUsername" name="username" autocomplete="off" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+					<div class="field"><label for="staffRole">Role</label><select id="staffRole" name="role"><option value="staff">Staff</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
+					<div class="field"><label for="staffPassword">Temporary password</label><input id="staffPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<button class="primary" type="submit">Create account <span aria-hidden="true">→</span></button>
+					<p class="message wide" id="staffMessage" role="alert"></p>
+				</form>
+			</section>
+			</section>
+
+			<section id="userDashboard" hidden>
+				<header class="content-heading"><div><p class="eyebrow">Workspace</p><h2>Your dashboard</h2><p>View your account details and manage your personal access settings.</p></div></header>
+				<section class="dashboard-stats" aria-label="Your account summary">
+					<article class="stat-card"><span class="stat-label">Account</span><strong class="stat-small" id="userDashboardName">—</strong><span class="stat-caption">Signed-in user</span></article>
+					<article class="stat-card"><span class="stat-label">Username</span><strong class="stat-small" id="userDashboardUsername">—</strong><span class="stat-caption">Your sign-in name</span></article>
+					<article class="stat-card"><span class="stat-label">Your access</span><strong id="userDashboardRole">—</strong><span class="stat-caption">Assigned role</span></article>
+					<article class="stat-card"><span class="stat-label">Digital signing</span><strong class="stat-small" id="userSigningMetric">Preparing</strong><span class="stat-caption">This browser's signing key</span></article>
+				</section>
+			</section>
+
+			<section class="account-services" aria-labelledby="accountServicesHeading">
+				<header class="content-heading account-services-heading"><div><p class="eyebrow">Account settings</p><h2 id="accountServicesHeading">Your account tools</h2><p>Update your sign-in email and manage personal digital signatures.</p></div></header>
+				<p class="directory-message" id="accountMessage" role="status"></p>
+				<section class="panel email-panel" aria-labelledby="emailHeading">
+					<div><h3 id="emailHeading">Email sign-in</h3><p>Add or update the email address for this account. Use it with your password instead of your username.</p></div>
+					<form id="emailSettingsForm" class="email-form"><div class="field"><label for="accountEmail">Account email</label><input id="accountEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div><button class="text-button" type="submit">Save email</button><p class="message" id="emailSettingsMessage" role="status"></p></form>
+				</section>
+
+				<section class="panel signature-panel" aria-labelledby="signatureHeading">
+				<div class="section-heading"><div><h3 id="signatureHeading">Digital signatures</h3><p>Sign a statement with an ECDSA key linked to your account. The private key stays in this browser.</p></div><span class="signature-status" id="signatureKeyStatus" role="status">Preparing signing key…</span></div>
+				<div class="field"><label for="signatureMessage">Statement to sign</label><textarea id="signatureMessage" maxlength="5000" rows="4" placeholder="Write the exact statement you want to sign"></textarea></div>
+				<button class="primary signature-button" id="signMessageButton" type="button" disabled>Sign statement</button>
+				<p class="message" id="signatureMessageStatus" role="status"></p>
+				<div class="signature-result" id="signatureResult" hidden><label for="signatureRecord">Signed record</label><textarea id="signatureRecord" rows="8" readonly></textarea><button class="text-button" id="downloadSignatureButton" type="button">Download signed record</button></div>
+				<div class="verify-row"><label for="signatureFile">Verify a signed record</label><input id="signatureFile" type="file" accept="application/json,.json"><button class="text-button" id="verifySignatureButton" type="button">Verify record</button><p class="directory-message" id="signatureVerifyStatus" role="status"></p></div>
+				<p class="fine-print">The server stores the public key; the private key is held in this browser's protected storage. Clearing browser data can remove it. Signatures alone do not establish legal status or verified identity.</p>
+				</section>
+			</section>
+		</div>
+	</main>
+</body>
+</html>
