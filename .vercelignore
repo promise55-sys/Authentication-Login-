@@ -1,0 +1,11 @@
+﻿.env
+.env.*
+!.env.example
+.local-data/
+backups/
+node_modules/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+Den-Promise-Access-Project-Report.pdf

@@ -1,6 +1,10 @@
-﻿# Den Promise Access
+﻿# Musicians World
 
-A responsive team login and directory app with a Node.js API. It supports role-based accounts, email sign-in, and browser-held ECDSA signatures.
+A responsive musician community with a Node.js API. Signed-in musicians can publish creative ideas, post and discover upcoming gigs, build public profiles, and share playable HTTPS audio previews or public Spotify, SoundCloud, and YouTube tracks with likes and comments. A separate authenticated dashboard includes local date/time, a selectable light/dark theme, and local weather from browser location or city search. Weather location requires browser permission; coordinates are sent to Open-Meteo and are not added to a musician profile. Member login email stays private unless a user explicitly shares a contact address on their profile or gig listing. The app also supports role-based accounts, email sign-in, and browser-held ECDSA signatures.
+
+Admins can restore deleted accounts from the Deleted accounts archive without setting a password. Restored accounts retain their archived password, and users can optionally change it in Account settings. Accounts deleted before credential archiving was added may not have a recoverable password in the archive.
+
+Users can recover an approved account with an email one-time code when that account has an email address. Set `RESEND_API_KEY` and a verified `EMAIL_FROM` to enable delivery. Recovery codes expire after 10 minutes, allow five verification attempts, and can be sent no more than once per minute or five times per hour per account. A successful recovery changes the password and invalidates existing sessions.
 
 ## Run locally
 
@@ -26,17 +30,54 @@ npm.cmd install
 npm.cmd start
 ```
 
-In Laragon, click **Start All**, open **Menu > Laragon > Terminal**, and run these commands. The PATH line selects Node.js 24 used in this workspace; change it if Node.js is installed elsewhere. Confirm `node --version` prints `v24...`. Then open http://127.0.0.1:8000. Keep the terminal open while you use the app; press **Ctrl+C** to stop it. If port 8000 is busy, run `$env:PORT=8001` before `npm.cmd start` and open http://127.0.0.1:8001. Do not open `index.html` directly or use VS Code Go Live. This uses a separate demo database in the project's ignored `.local-data` folder so your existing accounts are not exposed in the demo. On first use, create an admin account with a unique password of at least 12 characters. Production self-sign-up email requires Resend settings; without them, use an admin-created demo account.
+In Laragon, click **Start All**, open **Menu > Laragon > Terminal**, and run these commands. The PATH line selects Node.js 24 used in this workspace; change it if Node.js is installed elsewhere. Confirm `node --version` prints `v24...`. Then open http://127.0.0.1:8001. Keep the terminal open while you use the app; press **Ctrl+C** to stop it. Do not open `index.html` directly or use VS Code Go Live. This uses a separate demo database in the project's ignored `.local-data` folder so your existing accounts are not exposed in the demo. On first use, create an admin account with a unique password of at least 12 characters. Production self-sign-up email requires Resend settings; without them, use an admin-created demo account.
 
 To share a temporary demo link, start the app, open a second Laragon Terminal, and run the command below. Install `cloudflared` from Cloudflare if it is not already installed:
 
 ```powershell
-& "$env:TEMP\cloudflared.exe" tunnel --url http://127.0.0.1:8000
+& "$env:TEMP\cloudflared.exe" tunnel --url http://127.0.0.1:8001
 ```
 
 Keep both terminals open and share the generated `trycloudflare.com` URL. Quick Tunnels are temporary demo links; they stop working when the tunnel process exits and are not a production hosting setup. If Cloudflare cannot connect from your network, deploy to a public Node.js host.
 
-In VS Code, you can also press **F5** and select **Run app on port 8000**. This starts the Node server and opens the app at its working local URL.
+In VS Code, press **F5** and select **Live app on port 8001**. This avoids a stale server already using port 8000, starts the Node server in development mode, and opens the actual app URL automatically. Workspace files auto-save after one second; CSS changes update in place, while HTML and JavaScript changes reload the page. Use this launch configuration instead of the Live Preview or Go Live server so the page and `/api` requests use the same app server.
+
+## Deploy on Vercel
+
+This repository uses Vercel to serve the static files and run `api/index.js` as the `/api` Node.js Function. The local `server.js` is for Laragon and local development. Vercel Functions have a read-only filesystem, so configure Turso for persistent production accounts; do not use local SQLite for Vercel production data.
+
+1. Push this project to GitHub and import that repository in Vercel. Set the project root to the repository root. Select the **Other** framework preset; leave the build command empty because the frontend is static and the API is built from `api/index.js`.
+2. Create a Turso database and add these in Vercel **Settings > Environment Variables** for Production (and Preview if needed):
+
+   ```text
+   NODE_ENV=production
+   DATABASE_MODE=turso
+   TURSO_DATABASE_URL=libsql://your-database.turso.io
+   TURSO_AUTH_TOKEN=your-private-database-token
+   AUTH_PEPPER=your-stable-random-secret-at-least-32-characters
+   ```
+
+   Generate a new pepper locally with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"`. Save it as a Vercel secret and keep the exact same value for future deployments. Never use `.local-data` or a Vercel function's local filesystem for production accounts.
+3. If using email approval, also configure `RESEND_API_KEY`, a Resend-verified `EMAIL_FROM`, and `ADMIN_EMAIL`. Set `APP_URL` to the production URL, for example `https://your-project.vercel.app`. Email credentials and database tokens belong in Vercel Environment Variables, not in the repository.
+4. Deploy. The static website is served from the project root; API calls go to `/api`. On the first visit, create the initial administrator account.
+5. If using Google sign-in, set `GOOGLE_CLIENT_ID` and add the exact Vercel origin to the Google OAuth client's authorized JavaScript origins.
+
+Turso provides the persistent remote database. The local AES-encrypted SQLite backup job does not run for Turso; use Turso's database backup and restore features. The Vercel function configuration in `vercel.json` allows up to 30 seconds for requests, including email delivery.
+## Deploy on Render
+
+Use a Render **Web Service** with build command `npm install` and start command `npm start`. Render supplies the `PORT` value automatically.
+
+Production SQLite needs a Render persistent disk. In the service dashboard, add a disk mounted at `/var/data`, then set these environment variables and redeploy:
+
+```text
+NODE_ENV=production
+DATABASE_MODE=sqlite
+AUTH_DATA_DIR=/var/data
+```
+
+Render disks are available for paid services. Without a persistent disk, the app deliberately stops instead of storing accounts on Render's temporary filesystem. If your plan does not include persistent disks, use Turso instead: set `DATABASE_MODE=turso`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, and a stable `AUTH_PEPPER` in Render's Environment settings, and do not set `AUTH_DATA_DIR`. See [Render's persistent disk documentation](https://render.com/docs/disks) for disk setup and limitations.
+
+For signup and approval emails, also configure `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_EMAIL`, and `APP_URL` in Render's Environment settings. Keep secrets out of the repository.
 
 ## Deploy to your chosen hosting provider
 
@@ -44,7 +85,7 @@ This is a standard Node.js web app. Choose a host that can run a long-lived Node
 
 1. Install Node.js 20 or later and run `npm install` in the project directory.
 2. Configure the environment variables below in your host's private settings.
-3. Set the host's start command to `npm start`. The server listens on the `PORT` supplied by the host (or port 8000 locally).
+3. Set the host's start command to `npm start`. The server listens on the `PORT` supplied by the host (or port 8001 locally).
 4. Use HTTPS in production. Set `NODE_ENV=production` so session cookies are marked secure.
 
 ### Database storage
@@ -80,7 +121,7 @@ Verify the sender domain with Resend before using a production sender. `ADMIN_EM
 
 ### Google sign-in
 
-Create a Google OAuth client ID with application type **Web application**. Add the app's exact origins under **Authorized JavaScript origins** (for local development, `http://127.0.0.1:8000`; add your HTTPS production origin when deploying), then set this environment variable:
+Create a Google OAuth client ID with application type **Web application**. Add the app's exact origins under **Authorized JavaScript origins** (for local development, `http://127.0.0.1:8001`; add your HTTPS production origin when deploying), then set this environment variable:
 
 ```text
 GOOGLE_CLIENT_ID=your-web-client-id.apps.googleusercontent.com
@@ -126,9 +167,6 @@ If the previous PHP app used `AUTH_DATA_DIR` or `AUTH_PEPPER`, keep those same v
 - Signed-in members can sign statements with ECDSA P-256/SHA-256. Public keys are stored with the account. Private signing keys remain in browser IndexedDB and are not part of database migration or backup.
 
 Keep production behind HTTPS. Production cookies use the Secure attribute when `NODE_ENV=production`. Changing the session key derivation signs out existing sessions once; users can sign in again.
-
-
-
 
 
 

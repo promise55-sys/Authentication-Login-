@@ -6,12 +6,32 @@ const path = require('node:path');
 const ROOT = __dirname;
 require('./lib/load-env').loadEnvFile(path.join(ROOT, '.env'));
 const { handleApi } = require('./lib/handler');
-const PORT = Number(process.env.PORT || 8000);
+const PORT = Number(process.env.PORT || 8001);
+const DEVELOPMENT = process.env.NODE_ENV !== 'production';
 const assets = new Map([
 	['/index.html', ['index.html', 'text/html; charset=utf-8']],
+	['/world.html', ['world.html', 'text/html; charset=utf-8']],
 	['/style.css', ['style.css', 'text/css; charset=utf-8']],
 	['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
 ]);
+
+const liveReloadClients = new Set();
+let liveReloadTimer = null;
+
+function notifyLiveReload(filename) {
+	if (liveReloadTimer) clearTimeout(liveReloadTimer);
+	liveReloadTimer = setTimeout(() => {
+		for (const client of liveReloadClients) client.write(`data: ${filename}\n\n`);
+	}, 100);
+}
+
+if (DEVELOPMENT) {
+	const watchedFiles = new Set(['index.html', 'world.html', 'style.css', 'app.js']);
+	fs.watch(ROOT, { persistent: false }, (_event, changedFile) => {
+		const filename = changedFile && String(changedFile);
+		if (watchedFiles.has(filename)) notifyLiveReload(filename);
+	});
+}
 
 function sendJson(res, status, message) {
 	const body = JSON.stringify({ error: message });
@@ -21,6 +41,14 @@ function sendJson(res, status, message) {
 
 const server = http.createServer((req, res) => {
 	const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+	if (url.pathname === '/__dev/live') {
+		if (!DEVELOPMENT || req.method !== 'GET') { sendJson(res, 404, 'Not found.'); return; }
+		res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
+		res.write(': live reload connected\n\n');
+		liveReloadClients.add(res);
+		req.on('close', () => liveReloadClients.delete(res));
+		return;
+	}
 	if (url.pathname === '/api' || url.pathname === '/api/') {
 		void handleApi(req, res);
 		return;
@@ -36,9 +64,23 @@ const server = http.createServer((req, res) => {
 	if (!asset) { sendJson(res, 404, 'Not found.'); return; }
 	fs.readFile(path.join(ROOT, asset[0]), (error, data) => {
 		if (error) { sendJson(res, 404, 'Not found.'); return; }
-		res.writeHead(200, { 'Content-Type': asset[1], 'Cache-Control': asset[0] === 'index.html' ? 'no-cache' : 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' });
+		if (DEVELOPMENT && ['index.html', 'world.html'].includes(asset[0])) {
+			const liveReloadScript = `<script>(()=>{const events=new EventSource('/__dev/live');events.onmessage=({data:file})=>{if(file==='style.css'){for(const link of document.querySelectorAll('link[rel="stylesheet"]')){const url=new URL(link.href);url.searchParams.set('__live',Date.now());link.href=url;}return;}window.location.reload();};})();</script>`;
+			data = Buffer.from(data.toString('utf8').replace('</body>', `${liveReloadScript}</body>`));
+		}
+		const cacheControl = DEVELOPMENT ? 'no-store' : (['index.html', 'world.html'].includes(asset[0]) ? 'no-cache' : 'public, max-age=300');
+		res.writeHead(200, { 'Content-Type': asset[1], 'Cache-Control': cacheControl, 'X-Content-Type-Options': 'nosniff' });
 		res.end(req.method === 'HEAD' ? undefined : data);
 	});
+});
+
+server.on('error', (error) => {
+	if (error.code === 'EADDRINUSE') {
+		console.log(`Den Promise Access is already running at http://127.0.0.1:${PORT}`);
+		return;
+	}
+	console.error('Den Promise Access could not start:', error.message);
+	process.exitCode = 1;
 });
 
 server.listen(PORT, '0.0.0.0', () => {

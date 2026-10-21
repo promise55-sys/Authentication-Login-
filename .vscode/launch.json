@@ -2,15 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run app on port 8000",
+      "name": "Live app on port 8001",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/server.js",
       "env": {
-        "NODE_ENV": "production",
+        "NODE_ENV": "development",
         "DATABASE_MODE": "sqlite",
         "AUTH_DATA_DIR": "${workspaceFolder}/.local-data",
-        "PORT": "8000"
+        "PORT": "8001"
       },
       "serverReadyAction": {
         "pattern": "running at (http://\\S+)",

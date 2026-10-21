@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f4f6f0">
+	<meta name="description" content="Musicians World: a global community for musicians to find gigs, share ideas, and listen together.">
+	<title>Musicians World | Musician dashboard</title>
+	<link rel="stylesheet" href="style.css?v=11">
+	<script src="app.js?v=17" defer></script>
+</head>
+<body>
+	<main class="workspace" id="appView" hidden>
+		<header class="workspace-header">
+			<a class="workspace-brand" href="#world" aria-label="Musicians World dashboard"><span class="brand-mark">MW</span><div><h1>Musicians World</h1><p id="welcomeText">Global musician community</p></div></a>
+			<div class="session-actions"><span class="role-badge" id="roleBadge"></span><button class="text-button theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ <span>Dark mode</span></button><button class="text-button" id="accountNavButton" type="button" data-scroll-target="accountServices">Account</button><button class="text-button admin-nav-button" id="adminNavButton" type="button" data-scroll-target="adminDashboard" hidden>Admin tools</button><a class="text-button" id="worldOpenLink" href="/world.html" target="_blank" rel="noopener noreferrer">Open Musicians World ↗</a><button class="text-button" id="logoutButton" type="button">Sign out</button></div>
+		</header>
+		<div class="content">
+			<section class="world-status" id="world" aria-label="Your local date and weather">
+				<div class="world-date-card"><span class="status-icon" aria-hidden="true">◷</span><div><strong id="worldDate">Your local date</strong><span id="worldClock">--:--</span><small id="worldTimeZone">Local time</small><small id="worldCountry" role="status">Country: waiting for location permission</small></div></div>
+				<div class="weather-card"><span class="weather-symbol" id="weatherSymbol" aria-hidden="true">☁</span><div class="weather-reading"><strong id="weatherTemperature">—°</strong><span id="weatherDescription">Local weather</span><small id="weatherPlace">Location not set</small></div><button class="weather-location-button" id="weatherLocationButton" type="button">Use my location</button><p class="weather-message" id="weatherMessage" role="status"></p><details class="weather-search"><summary>Choose a place</summary><form id="weatherSearchForm"><input id="weatherPlaceSearch" name="place" maxlength="100" placeholder="Search city or country" aria-label="Search a city or country" required><button type="submit">Show weather</button></form></details><a class="weather-attribution" href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather by Open-Meteo</a></div>
+			</section>
+			<nav class="workspace-tabs" aria-label="Dashboard sections" role="tablist">
+				<button class="workspace-tab active" id="communityDashboardTab" type="button" role="tab" aria-selected="true" aria-controls="community" data-dashboard-tab="community">Musicians World</button>
+				<button class="workspace-tab" id="personalDashboardTab" type="button" role="tab" aria-selected="false" aria-controls="userDashboard" data-dashboard-tab="userDashboard">My dashboard</button>
+				<button class="workspace-tab" id="accountSettingsTab" type="button" role="tab" aria-selected="false" aria-controls="accountServices" data-dashboard-tab="accountServices">My account</button>
+				<button class="workspace-tab admin-workspace-tab" id="adminAccountsTab" type="button" role="tab" aria-selected="false" aria-controls="adminDashboard" data-dashboard-tab="adminDashboard" hidden>Account details</button>
+			</nav>
+			<section class="community" id="community" role="tabpanel" aria-labelledby="communityDashboardTab" aria-label="Musicians World community">
+				<header class="community-hero">
+					<div class="community-hero-copy"><p class="eyebrow">A world of music, together</p><h2>Your next sound starts here.</h2><p>Find a stage, share what you’re making, and meet musicians wherever music takes you.</p><small class="role-description" id="roleDescription">Your member workspace</small></div>
+					<div class="hero-orbit" aria-hidden="true"><span>♫</span><i></i><i></i><i></i></div>
+				</header>
+				<nav class="community-nav" aria-label="Community sections" role="tablist">
+					<button class="community-tab active" id="feedTabButton" type="button" role="tab" aria-selected="true" aria-controls="feedTab" data-community-tab="feed">The scene</button>
+					<button class="community-tab" id="gigsTabButton" type="button" role="tab" aria-selected="false" aria-controls="gigsTab" data-community-tab="gigs">Find a gig</button>
+					<button class="community-tab" id="musiciansTabButton" type="button" role="tab" aria-selected="false" aria-controls="musiciansTab" data-community-tab="musicians">Meet musicians</button>
+					<button class="community-tab" id="listenTabButton" type="button" role="tab" aria-selected="false" aria-controls="listenTab" data-community-tab="listen">Listen together</button>
+				</nav>
+				<section class="community-tab-panel" id="feedTab" role="tabpanel" aria-labelledby="feedTabButton">
+					<div class="scene-grid">
+						<div class="scene-main">
+							<section class="community-card composer-card" aria-labelledby="composerHeading"><div class="card-heading"><div><p class="eyebrow">Your creative corner</p><h3 id="composerHeading">What are you working on?</h3></div><span class="music-symbol" aria-hidden="true">♫</span></div>
+								<form id="communityPostForm"><div class="field"><label for="communityPostKind">Share an idea or find collaborators</label><select id="communityPostKind" name="kind"><option value="idea">Musical idea</option><option value="collab">Looking to collaborate</option></select></div><div class="field"><textarea id="communityPostBody" name="body" rows="3" maxlength="1200" placeholder="A melody, a lyric, a sound you can’t stop thinking about..." required></textarea><p class="hint">Share a work in progress, ask for feedback, or invite musicians to make something with you.</p></div><div class="composer-actions"><p class="message" id="communityPostMessage" role="status"></p><button class="primary" type="submit">Share with the world <span aria-hidden="true">→</span></button></div></form>
+							</section>
+							<section class="community-card"><div class="card-heading"><div><p class="eyebrow">Across the community</p><h3>Fresh from the scene</h3></div><span class="live-dot">Live community</span></div><div class="music-feed" id="musicFeed" aria-live="polite"><p class="community-empty">Loading the latest music conversations…</p></div></section>
+						</div>
+						<aside class="scene-rail"><section class="rail-card gig-rail"><span class="rail-icon" aria-hidden="true">✳</span><p class="eyebrow">Make it a live thing</p><h3>There’s a stage with your name on it.</h3><p>Explore opportunities posted by musicians in the community.</p><button class="text-button" type="button" data-open-community-tab="gigs">Explore the gig board <span aria-hidden="true">→</span></button><strong class="rail-count" id="featuredGigCount">Loading opportunities</strong></section><section class="rail-card people-rail"><span class="rail-icon" aria-hidden="true">◎</span><p class="eyebrow">Your people are out there</p><h3>Find your next bandmate.</h3><p>Connect with singers, songwriters, and players around the world.</p><button class="text-button" type="button" data-open-community-tab="musicians">Meet the community <span aria-hidden="true">→</span></button><strong class="rail-count" id="featuredMusicianCount">Loading musicians</strong></section></aside>
+					</div>
+				</section>
+				<section class="community-tab-panel" id="gigsTab" role="tabpanel" aria-labelledby="gigsTabButton" hidden>
+					<div class="tab-intro"><p class="eyebrow">The gig board</p><h3>Find your next stage.</h3><p>Tour dates, open mics, session work, and opportunities to play together.</p></div>
+					<div class="gig-layout"><section class="community-card gig-list-card"><div class="card-heading"><div><p class="eyebrow">Open calls</p><h3>Upcoming opportunities</h3></div><span class="request-count" id="gigCount">0 gigs</span></div><div class="gig-list" id="gigList" aria-live="polite"><p class="community-empty">Loading opportunities…</p></div></section>
+					<section class="community-card gig-form-card"><p class="eyebrow">Give someone a stage</p><h3>Post an opportunity</h3><p class="section-copy">Looking for an opener, a session player, or a band for your event? Put the word out.</p><form id="communityGigForm"><div class="field"><label for="gigTitle">Opportunity</label><input id="gigTitle" name="title" maxlength="100" placeholder="e.g. Guitarist for a weekend festival" required></div><div class="field"><label for="gigLocation">City, country or online</label><input id="gigLocation" name="location" maxlength="120" placeholder="Lisbon, Portugal" required></div><div class="field"><label for="gigDate">Date</label><input id="gigDate" name="eventDate" type="date" required></div><div class="field"><label for="gigDescription">Tell musicians about it</label><textarea id="gigDescription" name="description" rows="4" maxlength="1200" placeholder="The sound, set length, pay or other details..." required></textarea></div><div class="field"><label for="gigContactEmail">Public contact email <span class="optional">optional</span></label><input id="gigContactEmail" name="contactEmail" type="email" maxlength="254" placeholder="Leave blank to keep contact private"><p class="hint">This address will be visible to signed-in musicians on this listing.</p></div><button class="primary" type="submit">Post to the gig board <span aria-hidden="true">→</span></button><p class="message" id="communityGigMessage" role="status"></p></form></section></div>
+				</section>
+				<section class="community-tab-panel" id="musiciansTab" role="tabpanel" aria-labelledby="musiciansTabButton" hidden>
+					<div class="tab-intro"><p class="eyebrow">The world is your music scene</p><h3>Meet the musicians.</h3><p>Find your sound, your collaborators, and your people across the map.</p></div>
+					<details class="community-card profile-editor"><summary><span><strong>Set up your musician profile</strong><small>Tell the community what you play and where to find you.</small></span><span class="summary-arrow" aria-hidden="true">＋</span></summary><form id="musicianProfileForm" class="profile-form"><div class="profile-fields"><div class="field"><label for="profileLocation">Based in</label><input id="profileLocation" name="location" maxlength="120" placeholder="City, region or online"></div><div class="field"><label for="profileCountry">Country</label><input id="profileCountry" name="country" list="countryOptions" maxlength="120" placeholder="Select or enter your country"><datalist id="countryOptions"></datalist><p class="hint">Shown on your public musician profile. Use your detected country or enter another.</p></div><div class="field"><label for="profileInstruments">Instruments or role</label><input id="profileInstruments" name="instruments" maxlength="120" placeholder="Vocals, drums, producer…"></div><div class="field"><label for="profileGenres">Genres</label><input id="profileGenres" name="genres" maxlength="120" placeholder="Jazz, indie folk, amapiano…"></div><div class="field"><label for="profileContactEmail">Public contact email <span class="optional">optional</span></label><input id="profileContactEmail" name="contactEmail" type="email" maxlength="254" placeholder="Leave blank to keep contact private"></div><div class="field profile-bio"><label for="profileBio">A little about your sound</label><textarea id="profileBio" name="bio" rows="3" maxlength="500" placeholder="What do you love to play? What are you hoping to make?"></textarea></div></div><div class="composer-actions"><p class="message" id="profileMessage" role="status"></p><button class="primary" type="submit">Save my profile</button></div></form></details>
+					<div class="people-heading"><h3>Musicians around the world</h3><label class="country-filter-label" for="musicianCountryFilter">Country<select id="musicianCountryFilter"><option value="">All countries</option></select></label><span class="request-count" id="musicianCount">0 musicians</span></div><div class="musician-grid" id="musicianGrid" aria-live="polite"><p class="community-empty">Loading musicians…</p></div>
+				</section>
+				<section class="community-tab-panel" id="listenTab" role="tabpanel" aria-labelledby="listenTabButton" hidden>
+					<div class="tab-intro"><p class="eyebrow">The listening room</p><h3>Press play. Find your people.</h3><p>Share a public audio preview and discover what musicians around the world are making.</p></div>
+					<div class="listen-layout"><section class="community-card track-share-card"><p class="eyebrow">Put your sound out there</p><h3>Share a track</h3><p class="section-copy">Upload an audio preview or share a public streaming link. Musicians can listen, leave a comment, and show appreciation.</p><form id="trackShareForm"><div class="field"><label for="trackTitle">Track title</label><input id="trackTitle" name="title" maxlength="120" placeholder="Name your track" required></div><div class="field"><label for="trackGenre">Genre <span class="optional">optional</span></label><input id="trackGenre" name="genre" maxlength="80" placeholder="Alt R&amp;B, jazz, ambient…"></div><div class="field"><label for="trackAudioFile">Upload audio preview</label><input id="trackAudioFile" name="audioFile" type="file" accept="audio/mpeg,audio/mp4,audio/ogg,audio/wav,audio/webm,.mp3,.m4a,.ogg,.wav,.webm" aria-describedby="trackAudioHint"><p class="hint" id="trackAudioHint">MP3, M4A, OGG, WAV, or WebM audio up to 3 MB. Or use a public streaming link below.</p></div><div class="field"><label for="trackAudioUrl">Public streaming link <span class="optional">optional</span></label><input id="trackAudioUrl" name="audioUrl" type="url" maxlength="2000" placeholder="Spotify, SoundCloud, YouTube, or audio file"><p class="hint">Share a public HTTPS link. If you upload a file, this link is not needed.</p></div><div class="field"><label for="trackNote">A note for listeners <span class="optional">optional</span></label><textarea id="trackNote" name="note" rows="3" maxlength="500" placeholder="What inspired this? What feedback would you love?"></textarea></div><button class="primary" type="submit">Share my music <span aria-hidden="true">→</span></button><p class="message" id="trackShareMessage" role="status"></p></form></section><section class="community-card listening-feed-card"><div class="card-heading"><div><p class="eyebrow">Made by the community</p><h3>Tracks to discover</h3></div><span class="live-dot">Community listens</span></div><div class="track-feed" id="trackFeed" aria-live="polite"><p class="community-empty">Loading tracks…</p></div></section></div>
+				</section>
+			</section>
+			<section id="adminDashboard" role="tabpanel" aria-labelledby="adminAccountsTab" hidden>
+			<header class="content-heading"><div><p class="eyebrow">Admin only</p><h2>Admin account details</h2><p>Approve members, add accounts, change roles, delete or restore accounts, export the directory, and manage backups. Admins only.</p></div><span class="dashboard-date" id="dashboardDate"></span></header>
+
+			<section class="dashboard-stats" aria-label="Workspace summary">
+				<article class="stat-card"><span class="stat-label">Approved artists</span><strong id="memberCount">—</strong><span class="stat-caption">Artist directory</span></article>
+				<article class="stat-card admin-stat" id="pendingStatCard" hidden><span class="stat-label">Awaiting review</span><strong id="pendingCount">0</strong><span class="stat-caption">Access requests</span></article>
+				<article class="stat-card" id="accessStatCard"><span class="stat-label">Your role</span><strong id="accessMetric">Member</strong><span class="stat-caption">Assigned access</span></article>
+				<article class="stat-card"><span class="stat-label">Digital signing</span><strong class="stat-small" id="signingMetric">Preparing</strong><span class="stat-caption">This browser's signing key</span></article>
+			</section>
+
+			<section class="panel approvals-panel" id="approvalsPanel" aria-labelledby="approvalsHeading" hidden>
+				<div class="approvals-heading"><div><span class="eyebrow">Community access</span><h3 id="approvalsHeading">New member requests</h3><p>Approve new accounts before they can join the network.</p></div><span class="request-count" id="requestCount">0 pending</span></div>
+				<div class="approval-list" id="approvalRows"></div>
+				<p class="message" id="approvalMessage" role="status"></p>
+			</section>
+
+			<div class="admin-directory-heading"><div><h3>Manage accounts and roles</h3><p>Update roles, remove accounts, or export the current directory.</p></div><button class="review-button" id="exportUsersButton" type="button">Export directory</button></div><div class="directory-wrap"><table class="directory"><thead><tr><th>Team member</th><th>Username</th><th>Role</th><th>Access</th></tr></thead><tbody id="staffRows"></tbody></table></div>
+			<p class="directory-message" id="directoryMessage" role="status"></p>
+
+			<section class="admin-tools" id="adminTools">
+				<h3>Add a team account</h3><p>Give each new user their initial password securely.</p>
+				<form class="staff-form" id="staffForm">
+					<div class="field"><label for="staffName">Full name</label><input id="staffName" name="name" autocomplete="name" maxlength="80" required></div>
+					<div class="field"><label for="staffEmail">Email <span class="optional">optional</span></label><input id="staffEmail" name="email" type="email" autocomplete="email" maxlength="254"></div>
+					<div class="field"><label for="staffUsername">Username</label><input id="staffUsername" name="username" autocomplete="off" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+					<div class="field"><label for="staffRole">Role</label><select id="staffRole" name="role"><option value="staff">Community staff</option><option value="viewer">Musician</option><option value="admin">Admin</option></select></div>
+					<div class="field"><label for="staffPassword">Temporary password</label><input id="staffPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<button class="primary" type="submit">Create account <span aria-hidden="true">→</span></button>
+					<p class="message wide" id="staffMessage" role="alert"></p>
+				</form>
+			</section>
+
+			<section class="panel deleted-panel" id="deletedPanel" aria-labelledby="deletedHeading">
+				<div class="approvals-heading">
+					<div><span class="eyebrow">Archive</span><h3 id="deletedHeading">Deleted accounts</h3><p>Permanent record of every account removed by an administrator.</p></div>
+					<span class="request-count" id="deletedCount">0 records</span>
+				</div>
+				<div class="directory-wrap"><table class="directory" id="deletedTable">
+					<thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Deleted</th><th>Deleted by</th><th>Restore</th></tr></thead>
+					<tbody id="deletedRows"></tbody>
+				</table></div>
+				<p class="message" id="deletedMessage" role="status"></p>
+			</section>
+
+			<section class="panel backup-panel" id="backupPanel" aria-labelledby="backupHeading">
+				<div class="approvals-heading">
+					<div><span class="eyebrow">System</span><h3 id="backupHeading">Backup &amp; restore</h3><p>Create an encrypted backup now, or restore configuration keys from a previous backup. <strong>Restore does not change user data.</strong></p></div>
+					<button class="review-button approve" id="manualBackupButton" type="button">Back up now</button>
+				</div>
+				<p class="message" id="backupMessage" role="status"></p>
+				<div class="directory-wrap" id="backupListWrap">
+					<table class="directory" id="backupTable">
+						<thead><tr><th>Date</th><th>File</th><th>Size</th><th>Restore config</th></tr></thead>
+						<tbody id="backupRows"></tbody>
+					</table>
+				</div>
+			</section>
+			</section>
+
+
+			<section id="userDashboard" role="tabpanel" aria-labelledby="personalDashboardTab" hidden>
+				<header class="content-heading"><div><p class="eyebrow" id="personalDashboardEyebrow">Musician workspace</p><h2 id="personalDashboardHeading">Your dashboard</h2><p id="personalDashboardDescription">View your account details and manage your personal access settings.</p></div></header>
+				<section class="dashboard-stats" aria-label="Your account summary">
+					<article class="stat-card"><span class="stat-label">Account</span><strong class="stat-small" id="userDashboardName">—</strong><span class="stat-caption">Signed-in user</span></article>
+					<article class="stat-card"><span class="stat-label">Username</span><strong class="stat-small" id="userDashboardUsername">—</strong><span class="stat-caption">Your sign-in name</span></article>
+					<article class="stat-card"><span class="stat-label">Your access</span><strong id="userDashboardRole">—</strong><span class="stat-caption">Assigned role</span></article>
+					<article class="stat-card"><span class="stat-label">Digital signing</span><strong class="stat-small" id="userSigningMetric">Preparing</strong><span class="stat-caption">This browser's signing key</span></article>
+				</section>
+			</section>
+
+			<section class="account-services" id="accountServices" role="tabpanel" aria-labelledby="accountSettingsTab" hidden>
+				<header class="content-heading account-services-heading"><div><p class="eyebrow">Account settings</p><h2 id="accountServicesHeading">Your account tools</h2><p>Update your sign-in email and manage personal digital signatures.</p></div></header>
+				<p class="directory-message" id="accountMessage" role="status"></p>
+				<section class="panel email-panel" aria-labelledby="emailHeading">
+					<div><h3 id="emailHeading">Email sign-in</h3><p>Add or update the email address for this account. Use it with your password instead of your username.</p></div>
+					<form id="emailSettingsForm" class="email-form"><div class="field"><label for="accountEmail">Account email</label><input id="accountEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div><button class="text-button" type="submit">Save email</button><p class="message" id="emailSettingsMessage" role="status"></p></form>
+				</section>
+				<section class="panel email-panel" aria-labelledby="passwordHeading">
+					<div><h3 id="passwordHeading">Change password</h3><p>Keep your current password or choose a new one at any time. Use at least 12 characters.</p></div>
+					<form id="passwordSettingsForm" class="email-form">
+						<div class="field"><label for="currentPassword">Current password</label><input id="currentPassword" name="currentPassword" type="password" autocomplete="current-password" required></div>
+						<div class="field"><label for="newPassword">New password</label><input id="newPassword" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+						<div class="field"><label for="confirmPassword">Confirm new password</label><input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+						<button class="text-button" type="submit">Change password</button>
+						<p class="message" id="passwordSettingsMessage" role="status"></p>
+					</form>
+				</section>
+
+				<section class="panel signature-panel" aria-labelledby="signatureHeading">
+				<div class="section-heading"><div><h3 id="signatureHeading">Digital signatures</h3><p>Sign a statement with an ECDSA key linked to your account. The private key stays in this browser.</p></div><span class="signature-status" id="signatureKeyStatus" role="status">Preparing signing key…</span></div>
+				<div class="field"><label for="signatureMessage">Statement to sign</label><textarea id="signatureMessage" maxlength="5000" rows="4" placeholder="Write the exact statement you want to sign"></textarea></div>
+				<button class="primary signature-button" id="signMessageButton" type="button" disabled>Sign statement</button>
+				<p class="message" id="signatureMessageStatus" role="status"></p>
+				<div class="signature-result" id="signatureResult" hidden><label for="signatureRecord">Signed record</label><textarea id="signatureRecord" rows="8" readonly></textarea><button class="text-button" id="downloadSignatureButton" type="button">Download signed record</button></div>
+				<div class="verify-row"><label for="signatureFile">Verify a signed record</label><input id="signatureFile" type="file" accept="application/json,.json"><button class="text-button" id="verifySignatureButton" type="button">Verify record</button><p class="directory-message" id="signatureVerifyStatus" role="status"></p></div>
+				<p class="fine-print">The server stores the public key; the private key is held in this browser's protected storage. Clearing browser data can remove it. Signatures alone do not establish legal status or verified identity.</p>
+				</section>
+			</section>
+		</div>
+	</main>
+</body>
+</html>
