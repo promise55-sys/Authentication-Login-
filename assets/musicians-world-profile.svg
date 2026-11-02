@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Musicians World music globe logo</title>
+  <defs>
+    <linearGradient id="background" x1="18" y1="12" x2="110" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#292044"/>
+      <stop offset="1" stop-color="#101522"/>
+    </linearGradient>
+    <linearGradient id="note" x1="46" y1="38" x2="91" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9AF3D8"/>
+      <stop offset="1" stop-color="#C9A8FF"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="url(#background)"/>
+  <circle cx="64" cy="64" r="50" fill="none" stroke="#9AF3D8" stroke-opacity=".72" stroke-width="2"/>
+  <ellipse cx="64" cy="64" rx="22" ry="50" fill="none" stroke="#9AF3D8" stroke-opacity=".42" stroke-width="1.5"/>
+  <path d="M17 64h94M25 42c11 8 24 12 39 12s28-4 39-12M25 86c11-8 24-12 39-12s28 4 39 12" fill="none" stroke="#C9A8FF" stroke-opacity=".45" stroke-width="1.5"/>
+  <path d="M71 32v43.5a12 12 0 1 1-7-10.95V43l31-7v35.5a12 12 0 1 1-7-10.95V31z" fill="url(#note)" stroke="#171324" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  <circle cx="18" cy="29" r="3" fill="#C9A8FF"/>
+  <circle cx="108" cy="96" r="3" fill="#9AF3D8"/>
+</svg>

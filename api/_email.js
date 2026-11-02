@@ -66,12 +66,12 @@ function adminRequestNotice(user) {
 	const name = html(user.full_name);
 	const email = html(user.email);
 	const username = html(user.username);
+	const country = html(user.country || 'Not provided');
 	return {
 		subject: `Access request from ${user.full_name}`,
-		text: `A new account is waiting for review. Name: ${user.full_name}. Username: ${user.username}. Email: ${user.email}. Sign in to the admin dashboard to approve or decline it.`,
-		html: `<p>A new account is waiting for review.</p><ul><li>Name: ${name}</li><li>Username: ${username}</li><li>Email: ${email}</li></ul><p>Sign in to the admin dashboard to approve or decline it.</p>`,
+		text: `A new account is waiting for review. Name: ${user.full_name}. Username: ${user.username}. Email: ${user.email}. Country joining from: ${user.country || 'Not provided'}. Sign in to the admin dashboard to approve or decline it.`,
+		html: `<p>A new account is waiting for review.</p><ul><li>Name: ${name}</li><li>Username: ${username}</li><li>Email: ${email}</li><li>Country joining from: ${country}</li></ul><p>Sign in to the admin dashboard to approve or decline it.</p>`,
 	};
 }
 
 module.exports = { adminRequestNotice, emailConfigured, requestReceived, reviewNotice, sendEmail };
-

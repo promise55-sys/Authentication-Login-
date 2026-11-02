@@ -1,6 +1,6 @@
 ﻿# Musicians World
 
-A responsive musician community with a Node.js API. Signed-in musicians can publish creative ideas, post and discover upcoming gigs, build public profiles, and share playable HTTPS audio previews or public Spotify, SoundCloud, and YouTube tracks with likes and comments. A separate authenticated dashboard includes local date/time, a selectable light/dark theme, and local weather from browser location or city search. Weather location requires browser permission; coordinates are sent to Open-Meteo and are not added to a musician profile. Member login email stays private unless a user explicitly shares a contact address on their profile or gig listing. The app also supports role-based accounts, email sign-in, and browser-held ECDSA signatures.
+A responsive, music-first community with a Node.js API. Signed-in musicians can publish creative ideas, post and discover upcoming gigs, build public profiles, and share playable HTTPS audio previews or public Spotify, SoundCloud, and YouTube tracks with likes and comments. The responsive dashboard includes a concert-photo carousel, concert-video picks, animated music-inspired styling, local date/time and weather, and a dark-first purple theme with a higher-contrast light option. The interface can be switched between English, Spanish, French, Portuguese, and Swahili; language selection is saved on the device and account. User-authored posts, artist names, and third-party media titles stay in their original language. Weather coordinates are sent to Open-Meteo and are not added to a musician profile. Member login email stays private from other members unless a user explicitly shares a contact address on their profile or gig listing. Only administrators can access account email, registration country, and account sign-in/sign-out history. The app also supports role-based accounts, email sign-in, and browser-held ECDSA signatures.
 
 Admins can restore deleted accounts from the Deleted accounts archive without setting a password. Restored accounts retain their archived password, and users can optionally change it in Account settings. Accounts deleted before credential archiving was added may not have a recoverable password in the archive.
 
@@ -23,7 +23,7 @@ To enable email, configure `RESEND_API_KEY`, a Resend-verified `EMAIL_FROM`, `AD
 cd "C:\Users\pdena\OneDrive\Desktop\Authentication Login"
 $env:Path = "C:\Program Files\nodejs;$env:Path"
 node --version
-$env:NODE_ENV = "production"
+$env:NODE_ENV = "development"
 $env:DATABASE_MODE = "sqlite"
 $env:AUTH_DATA_DIR = Join-Path (Get-Location) ".local-data"
 npm.cmd install
@@ -31,6 +31,8 @@ npm.cmd start
 ```
 
 In Laragon, click **Start All**, open **Menu > Laragon > Terminal**, and run these commands. The PATH line selects Node.js 24 used in this workspace; change it if Node.js is installed elsewhere. Confirm `node --version` prints `v24...`. Then open http://127.0.0.1:8001. Keep the terminal open while you use the app; press **Ctrl+C** to stop it. Do not open `index.html` directly or use VS Code Go Live. This uses a separate demo database in the project's ignored `.local-data` folder so your existing accounts are not exposed in the demo. On first use, create an admin account with a unique password of at least 12 characters. Production self-sign-up email requires Resend settings; without them, use an admin-created demo account.
+
+If you forget a password for this local SQLite demo and email recovery is not configured, stop the server with **Ctrl+C** and run `node scripts/reset-local-password.js` in the same terminal, with `AUTH_DATA_DIR` still set to `.local-data`. The command prompts for a username and new password, hides password input, and resets only that local account's password and failed-login counter. It does not work against a hosted database.
 
 To share a temporary demo link, start the app, open a second Laragon Terminal, and run the command below. Install `cloudflared` from Cloudflare if it is not already installed:
 
@@ -41,6 +43,14 @@ To share a temporary demo link, start the app, open a second Laragon Terminal, a
 Keep both terminals open and share the generated `trycloudflare.com` URL. Quick Tunnels are temporary demo links; they stop working when the tunnel process exits and are not a production hosting setup. If Cloudflare cannot connect from your network, deploy to a public Node.js host.
 
 In VS Code, press **F5** and select **Live app on port 8001**. This avoids a stale server already using port 8000, starts the Node server in development mode, and opens the actual app URL automatically. Workspace files auto-save after one second; CSS changes update in place, while HTML and JavaScript changes reload the page. Use this launch configuration instead of the Live Preview or Go Live server so the page and `/api` requests use the same app server.
+
+## Expo mobile app
+
+The Expo Android/iOS app is maintained separately in the sibling `Musicians World Mobile` folder, outside this website project. It opens the deployed website and uses the same sign-in flow and API. Configure `EXPO_PUBLIC_SITE_URL` in that project's `.env` for local use or its EAS environment for release builds. Backend credentials such as the Turso token and pepper must stay on the server and must not be added to Expo environment variables.
+
+The browser-based mobile sign-in page is available at `/mobile`. It shares the same account setup, password recovery, Google sign-in, and API as the desktop page; after sign-in it opens the responsive musician dashboard. New viewer requests include a required country selection, saved with the account and shown to administrators in pending approvals, the account directory, and directory exports. Existing accounts without a submitted country remain marked as not provided.
+
+The community hero opens with a muted Pexels gospel concert clip, a typing-effect headline, and an animated gospel singer illustration. Below the hero is a separate row of five click-to-play gospel and worship concert picks from their original YouTube channels. The selected picks are “Nkyinkyim Xperience 2025,” “The Praise · Live” by Diana Hamilton Official, “Spirit Of Praise 7,” a live Worship Together set, and The Icons Music live experience. A separate five-image concert carousel uses Unsplash image URLs. The player embeds YouTube's public videos; users start playback themselves. The hero video is “Vibrant Christian Music Concert with Raised Hands” by Mariano Quintero on [Pexels](https://www.pexels.com/video/vibrant-christian-music-concert-with-raised-hands-37639706/). Video and image availability remain subject to their hosts and creators' settings.
 
 ## Deploy on Vercel
 
@@ -62,26 +72,16 @@ This repository uses Vercel to serve the static files and run `api/index.js` as 
 4. Deploy. The static website is served from the project root; API calls go to `/api`. On the first visit, create the initial administrator account.
 5. If using Google sign-in, set `GOOGLE_CLIENT_ID` and add the exact Vercel origin to the Google OAuth client's authorized JavaScript origins.
 
-Turso provides the persistent remote database. The local AES-encrypted SQLite backup job does not run for Turso; use Turso's database backup and restore features. The Vercel function configuration in `vercel.json` allows up to 30 seconds for requests, including email delivery.
+Turso provides the persistent remote database. The local AES-encrypted SQLite backup job does not run for Turso; use Turso's database backup and restore features. Vercel automatically detects the Node.js API function in the root `api` directory.
 ## Deploy on Render
 
-Use a Render **Web Service** with build command `npm install` and start command `npm start`. Render supplies the `PORT` value automatically.
+The repository includes a Render Blueprint in `render.yaml` that runs the app with SQLite on a 1 GB persistent disk—no Turso account or database credentials needed. In Render, choose **New > Blueprint**, connect this GitHub repository, and select the Blueprint. It runs `npm ci`, starts with `npm start`, and checks `/healthz`. The Blueprint mounts persistent storage at `/var/data`, sets `AUTH_DATA_DIR=/var/data`, and creates the SQLite database and private pepper there automatically. Persistent disks require a paid Render web service; the Blueprint selects the Starter plan. Keep the disk attached and do not change its mount path. Set `RESEND_API_KEY` and `EMAIL_FROM` to enable email; set `ADMIN_EMAIL` for admin notifications if the admin account does not already have an email address. Render's `RENDER_EXTERNAL_URL` supplies approval links automatically; set `APP_URL` only when using a custom domain.
 
-Production SQLite needs a Render persistent disk. In the service dashboard, add a disk mounted at `/var/data`, then set these environment variables and redeploy:
-
-```text
-NODE_ENV=production
-DATABASE_MODE=sqlite
-AUTH_DATA_DIR=/var/data
-```
-
-Render disks are available for paid services. Without a persistent disk, the app deliberately stops instead of storing accounts on Render's temporary filesystem. If your plan does not include persistent disks, use Turso instead: set `DATABASE_MODE=turso`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, and a stable `AUTH_PEPPER` in Render's Environment settings, and do not set `AUTH_DATA_DIR`. See [Render's persistent disk documentation](https://render.com/docs/disks) for disk setup and limitations.
-
-For signup and approval emails, also configure `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_EMAIL`, and `APP_URL` in Render's Environment settings. Keep secrets out of the repository.
+For signup and approval emails, configure `RESEND_API_KEY` and `EMAIL_FROM` in Render's Environment settings. Set `ADMIN_EMAIL` for admin notifications if the admin account does not already have an email address, and set `APP_URL` only to override the automatic Render URL. Keep secrets out of the repository. Verify the sender domain with Resend; the sender address must belong to that verified domain.
 
 ## Deploy to your chosen hosting provider
 
-This is a standard Node.js web app. Choose a host that can run a long-lived Node.js process and provide persistent storage for SQLite, or use Turso as the remote database. The included `server.js` serves the website and API together.
+This is a standard Node.js web app. Choose a host that can run a long-lived Node.js process and provide persistent storage for SQLite, or configure Turso as a remote database. The included `server.js` serves the website and API together.
 
 1. Install Node.js 20 or later and run `npm install` in the project directory.
 2. Configure the environment variables below in your host's private settings.
@@ -92,7 +92,7 @@ This is a standard Node.js web app. Choose a host that can run a long-lived Node
 
 For local SQLite, set `AUTH_DATA_DIR` to a persistent directory on the host. The database, pepper key, backup encryption key, and encrypted daily backups are stored there. Keep this directory across restarts and deployments. Local SQLite is intended for a single app instance; use a shared remote database if you run multiple instances.
 
-For the selected Turso setup, set `DATABASE_MODE=turso`, `TURSO_DATABASE_URL`, and `TURSO_AUTH_TOKEN`. Configure a stable `AUTH_PEPPER` secret in the host environment; remote database mode requires it. To keep existing accounts working, use the secret inside the outer `*` characters in `%LOCALAPPDATA%\NorthstarAccess\pepper.key` (do not include the `*` characters). Keep it private and do not rotate it unless you are prepared to reset passwords. Production SQLite mode requires `AUTH_DATA_DIR` so the database is placed on an explicitly configured persistent volume.
+For SQLite on Render, the included Blueprint sets `DATABASE_MODE=sqlite` and `AUTH_DATA_DIR=/var/data` on a persistent disk. SQLite creates its pepper key and database in this directory, so no Turso account, token, or separate `AUTH_PEPPER` setting is required. Preserve the disk across restarts and deployments. To connect Turso instead, set `DATABASE_MODE=turso`, `TURSO_DATABASE_URL`, and `TURSO_AUTH_TOKEN`, and configure a stable `AUTH_PEPPER` secret. Production SQLite on any host requires `AUTH_DATA_DIR` to point to explicitly configured persistent storage.
 
 For a new database, generate a pepper locally with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"` and save the output in the host's secret settings as `AUTH_PEPPER`. Do not commit it or share it in chat. Create a Turso database, get its database URL and auth token, and add them as `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. Set `NODE_ENV=production` in the host environment.
 
@@ -161,12 +161,9 @@ If the previous PHP app used `AUTH_DATA_DIR` or `AUTH_PEPPER`, keep those same v
 
 - Users sign in with username or email and password.
 - Viewer sign-up becomes available after initial admin setup.
-- Admins get the team dashboard, where they can review requests, view the account directory, create accounts, and remove other accounts. The final admin and the currently signed-in account cannot be removed.
+- Admins get the team dashboard, where they can review requests, view the account directory, create accounts, remove other accounts, and edit their public profile picture and short bio. Admin profile details appear in the community directory. The final admin and the currently signed-in account cannot be removed.
 - Staff and viewers get a separate personal dashboard and cannot view the account directory or admin controls.
 - All signed-in members can update their own email address.
 - Signed-in members can sign statements with ECDSA P-256/SHA-256. Public keys are stored with the account. Private signing keys remain in browser IndexedDB and are not part of database migration or backup.
 
 Keep production behind HTTPS. Production cookies use the Secure attribute when `NODE_ENV=production`. Changing the session key derivation signs out existing sessions once; users can sign in again.
-
-
-

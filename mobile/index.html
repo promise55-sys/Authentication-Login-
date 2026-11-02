@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="theme-color" content="#0b0911">
+	<meta name="description" content="Sign in to Musicians World, a global community for musicians.">
+	<title>Musicians World | Mobile access</title>
+	<link rel="icon" type="image/svg+xml" href="/assets/musicians-world-profile.svg">
+	<link rel="stylesheet" href="/mobile/style.css?v=7">
+	<script src="/translations.js?v=4" defer></script>
+	<script src="/app.js?v=26" defer></script>
+</head>
+<body>
+	<section class="music-splash" id="welcomeSplash" aria-label="Welcome to Musicians World">
+		<div class="splash-stage" aria-hidden="true"><span class="splash-orbit orbit-one"></span><span class="splash-orbit orbit-two"></span><span class="splash-note note-one">♪</span><span class="splash-note note-two">♫</span><span class="splash-note note-three">♬</span><span class="splash-equalizer"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+		<div class="splash-content"><a class="splash-brand" href="/mobile" aria-label="Musicians World home"><span class="splash-brand-mark"><img src="/assets/musicians-world-profile.svg" alt=""></span><span>Musicians World<span class="brand-dot">.</span></span></a><label class="splash-language"><span>Language</span><select id="introLanguage" aria-label="Choose page language"><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="pt">Português</option><option value="sw">Kiswahili</option></select></label><p class="splash-kicker">A global home for music makers</p><h1>Find your people.<br><span>Make your sound.</span></h1><p class="splash-copy">Singers, instrumentalists and music lovers—one world, one stage, an endless rhythm.</p><button class="splash-enter" type="button" data-enter-site disabled>Continue <span aria-hidden="true">→</span></button><div class="splash-progress-track" id="splashProgressTrack"><progress class="splash-progress" id="splashProgress" max="30" value="0" aria-label="Welcome screen progress"></progress><span class="splash-progress-note" aria-hidden="true">♫</span></div><p class="sr-only" id="splashProgressAnnouncement" role="status" aria-live="polite" aria-atomic="true"></p></div>
+		<span class="splash-bottom">CREATE · CONNECT · PLAY TOGETHER</span>
+	</section>
+	<main class="mobile-auth" id="loginView">
+		<header class="mobile-header">
+			<a class="mobile-logo" href="/mobile" aria-label="Musicians World mobile home"><span class="mobile-mark"><img src="/assets/musicians-world-profile.svg" alt=""></span><span>Musicians World<span class="period">.</span></span></a>
+			<span class="secure-label"><span aria-hidden="true"></span>Secure access</span>
+		</header>
+		<div class="mobile-card">
+			<section id="setupStep" hidden>
+				<p class="mobile-step"><span></span>Initial setup · Admin</p>
+				<h1>Create your admin account</h1>
+				<p class="mobile-intro">Set up the account that manages staff access. Use a unique password with at least 12 characters.</p>
+				<form id="setupForm">
+					<div class="mobile-field"><label for="setupName">Full name</label><input id="setupName" name="name" autocomplete="name" maxlength="80" required></div>
+					<div class="mobile-field"><label for="setupEmail">Email <span class="optional">optional</span></label><input id="setupEmail" name="email" type="email" autocomplete="email" maxlength="254"></div>
+					<div class="mobile-field"><label for="setupUsername">Username</label><input id="setupUsername" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+					<div class="mobile-field"><label for="setupPassword">Password</label><input id="setupPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<button class="mobile-primary" type="submit">Create admin account <span aria-hidden="true">→</span></button>
+					<p class="mobile-message" id="setupMessage" role="alert"></p>
+				</form>
+			</section>
+
+			<section id="passwordStep" hidden>
+				<p class="mobile-step"><span></span>Account sign in</p>
+				<h1>Welcome back</h1>
+				<p class="mobile-intro">Sign in to your Musicians World account and continue your journey.</p>
+				<form id="loginForm">
+					<div class="mobile-field"><label for="username">Email or username</label><input id="username" name="username" autocomplete="username" placeholder="name@example.com or alex.admin" required><p class="mobile-hint">Use the email address on your account or your username.</p></div>
+					<div class="mobile-field"><label for="password">Password</label><div class="mobile-password"><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="mobile-reveal" id="togglePassword" type="button" aria-label="Show password">Show</button></div></div>
+					<div class="mobile-remember"><label><input id="savePassword" type="checkbox"><span>Save password in this browser</span></label><p class="mobile-hint">Uses your browser password manager. The app never stores your plain-text password.</p></div>
+					<button class="mobile-primary" type="submit">Continue securely <span aria-hidden="true">→</span></button>
+					<p class="mobile-message" id="loginMessage" role="alert"></p>
+				</form>
+				<div class="mobile-google" id="googleSignInSection" hidden>
+					<p class="mobile-google-divider">Or continue with</p>
+					<div id="googleSignInButton"></div>
+					<p class="mobile-hint">New Google accounts receive a confirmation email and need administrator approval.</p>
+					<p class="mobile-message" id="googleLoginMessage" role="status"></p>
+				</div>
+				<button class="mobile-link-button" id="showRecoveryButton" type="button">Forgot your password? Recover it with a code</button>
+				<button class="mobile-link-button" id="showSignupButton" type="button">Create a viewer account</button>
+				<p class="mobile-server-note">Passwords and permissions are checked by the Node.js server. New viewer accounts need administrator approval.</p>
+			</section>
+
+			<section id="recoveryStep" hidden>
+				<p class="mobile-step"><span></span>Account recovery</p>
+				<h1>Reset your password</h1>
+				<p class="mobile-intro">Request a one-time code at the email address on your account. If you can’t access that email, contact your administrator.</p>
+				<form id="recoveryRequestForm">
+					<div class="mobile-field"><label for="recoveryRequestIdentity">Email or username</label><input id="recoveryRequestIdentity" name="identity" autocomplete="username" maxlength="254" required></div>
+					<button class="mobile-primary" id="recoveryCodeRequestButton" type="submit">Send verification code <span aria-hidden="true">→</span></button>
+					<p class="mobile-hint" id="recoverySetupNote" role="status" hidden>Password recovery is temporarily unavailable because email delivery is not configured. Contact the administrator to configure recovery email.</p>
+					<p class="mobile-message" id="recoveryRequestMessage" role="status"></p>
+				</form>
+				<form id="recoveryVerifyForm" hidden>
+					<p class="mobile-hint">If an approved account matches, you’ll receive a code at its registered email address. It expires in 10 minutes. Use a password of at least 12 characters.</p>
+					<input id="recoveryIdentity" name="identity" type="hidden">
+					<div class="mobile-field"><label for="recoveryCode">Six-digit verification code</label><input id="recoveryCode" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div>
+					<div class="mobile-field"><label for="recoveryNewPassword">New password</label><input id="recoveryNewPassword" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<div class="mobile-field"><label for="recoveryConfirmPassword">Confirm new password</label><input id="recoveryConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<button class="mobile-primary" type="submit">Reset password securely <span aria-hidden="true">→</span></button>
+					<p class="mobile-message" id="recoveryVerifyMessage" role="alert"></p>
+					<button class="mobile-link-button" id="resendRecoveryButton" type="button">Send another code</button>
+				</form>
+				<button class="mobile-link-button" id="cancelRecoveryButton" type="button">← Back to sign in</button>
+			</section>
+
+			<section id="signupStep" hidden>
+				<p class="mobile-step"><span></span>New account</p>
+				<h1>Create your account</h1>
+				<p class="mobile-intro">Request a viewer account with your email and a strong password. An administrator can approve it sooner; if no decision is made, it will be approved automatically after 24 hours.</p>
+				<form id="signupForm">
+					<div class="mobile-field"><label for="signupName">Full name</label><input id="signupName" name="name" autocomplete="name" maxlength="80" required></div>
+					<div class="mobile-field"><label for="signupEmail">Email</label><input id="signupEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+					<div class="mobile-field"><label for="signupCountry">Country you’re joining from</label><select id="signupCountry" name="countryCode" autocomplete="country" required><option value="">Choose your country</option></select><p class="mobile-hint">Only administrators can see this registration detail.</p></div>
+					<div class="mobile-field"><label for="signupUsername">Username</label><input id="signupUsername" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._]{3,32}" required></div>
+					<div class="mobile-field"><label for="signupPassword">Password</label><input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required></div>
+					<div class="mobile-remember compact"><label><input id="saveSignupPassword" type="checkbox"><span>Save password in this browser</span></label></div>
+					<button class="mobile-primary" type="submit">Create viewer account <span aria-hidden="true">→</span></button>
+					<p class="mobile-message" id="signupMessage" role="alert"></p> 
+				</form>
+				<div class="mobile-google" id="googleSignupSection" hidden>
+					<p class="mobile-google-divider">Or request access with Google</p>
+					<div id="googleSignupButton"></div>
+					<p class="mobile-hint">Your verified Google email will receive a confirmation. An administrator can approve your account sooner; otherwise it is approved automatically after 24 hours.</p>
+					<p class="mobile-message" id="googleSignupMessage" role="status"></p>
+				</div>
+				<button class="mobile-link-button" id="cancelSignupButton" type="button">← Back to sign in</button>
+			</section>
+		</div>
+		<footer class="mobile-footer"><span>Secure access to the global musician community.</span><a href="/">Desktop version</a></footer>
+	</main>
+</body>
+</html>

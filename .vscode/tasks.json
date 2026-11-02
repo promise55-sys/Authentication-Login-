@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Musicians World locally",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"set NODE_ENV=development&& set DATABASE_MODE=sqlite&& set AUTH_DATA_DIR=.local-data&& npm.cmd start"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

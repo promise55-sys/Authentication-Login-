@@ -13,6 +13,14 @@ const assets = new Map([
 	['/world.html', ['world.html', 'text/html; charset=utf-8']],
 	['/style.css', ['style.css', 'text/css; charset=utf-8']],
 	['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
+	['/translations.js', ['translations.js', 'text/javascript; charset=utf-8']],
+	['/mobile', [path.join('mobile', 'index.html'), 'text/html; charset=utf-8']],
+	['/mobile/', [path.join('mobile', 'index.html'), 'text/html; charset=utf-8']],
+	['/mobile/index.html', [path.join('mobile', 'index.html'), 'text/html; charset=utf-8']],
+	['/mobile/style.css', [path.join('mobile', 'style.css'), 'text/css; charset=utf-8']],
+	['/assets/musicians-world-profile.svg', [path.join('assets', 'musicians-world-profile.svg'), 'image/svg+xml; charset=utf-8']],
+	['/assets/live-stage.mp4', [path.join('assets', 'live-stage.mp4'), 'video/mp4']],
+	['/assets/live-stage-poster.jpg', [path.join('assets', 'live-stage-poster.jpg'), 'image/jpeg']],
 ]);
 
 const liveReloadClients = new Set();
@@ -26,10 +34,14 @@ function notifyLiveReload(filename) {
 }
 
 if (DEVELOPMENT) {
-	const watchedFiles = new Set(['index.html', 'world.html', 'style.css', 'app.js']);
+	const watchedFiles = new Set(['index.html', 'world.html', 'style.css', 'app.js', 'translations.js']);
 	fs.watch(ROOT, { persistent: false }, (_event, changedFile) => {
 		const filename = changedFile && String(changedFile);
 		if (watchedFiles.has(filename)) notifyLiveReload(filename);
+	});
+	fs.watch(path.join(ROOT, 'mobile'), { persistent: false }, (_event, changedFile) => {
+		const filename = changedFile && String(changedFile);
+		if (filename === 'index.html' || filename === 'style.css') notifyLiveReload(filename);
 	});
 }
 
@@ -41,6 +53,12 @@ function sendJson(res, status, message) {
 
 const server = http.createServer((req, res) => {
 	const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+	if (url.pathname === '/healthz' && (req.method === 'GET' || req.method === 'HEAD')) {
+		const body = JSON.stringify({ status: 'ok' });
+		res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+		res.end(req.method === 'HEAD' ? undefined : body);
+		return;
+	}
 	if (url.pathname === '/__dev/live') {
 		if (!DEVELOPMENT || req.method !== 'GET') { sendJson(res, 404, 'Not found.'); return; }
 		res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
@@ -64,11 +82,11 @@ const server = http.createServer((req, res) => {
 	if (!asset) { sendJson(res, 404, 'Not found.'); return; }
 	fs.readFile(path.join(ROOT, asset[0]), (error, data) => {
 		if (error) { sendJson(res, 404, 'Not found.'); return; }
-		if (DEVELOPMENT && ['index.html', 'world.html'].includes(asset[0])) {
+		if (DEVELOPMENT && ['index.html', 'world.html', path.join('mobile', 'index.html')].includes(asset[0])) {
 			const liveReloadScript = `<script>(()=>{const events=new EventSource('/__dev/live');events.onmessage=({data:file})=>{if(file==='style.css'){for(const link of document.querySelectorAll('link[rel="stylesheet"]')){const url=new URL(link.href);url.searchParams.set('__live',Date.now());link.href=url;}return;}window.location.reload();};})();</script>`;
 			data = Buffer.from(data.toString('utf8').replace('</body>', `${liveReloadScript}</body>`));
 		}
-		const cacheControl = DEVELOPMENT ? 'no-store' : (['index.html', 'world.html'].includes(asset[0]) ? 'no-cache' : 'public, max-age=300');
+		const cacheControl = DEVELOPMENT ? 'no-store' : (['index.html', 'world.html', path.join('mobile', 'index.html')].includes(asset[0]) ? 'no-cache' : 'public, max-age=300');
 		res.writeHead(200, { 'Content-Type': asset[1], 'Cache-Control': cacheControl, 'X-Content-Type-Options': 'nosniff' });
 		res.end(req.method === 'HEAD' ? undefined : data);
 	});
@@ -87,6 +105,3 @@ server.listen(PORT, '0.0.0.0', () => {
 	console.log(`Den Promise Access is running at http://127.0.0.1:${PORT}`);
 	console.log('Use Ctrl+C to stop the development server.');
 });
-
-
-
